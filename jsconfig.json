@@ -4,7 +4,25 @@
         "paths": {
             "@/*": [
                 "resources/js/*"
-            ]
+            ],
+            "@/components/*": [
+                "resources/js/components/*"
+            ],
+            "@/hooks/*": [
+                "resources/js/hooks/*"
+            ],
+            "@/pages/*": [
+                "resources/js/pages/*"
+            ],
+            "@/routes/*": [
+                "resources/js/routes/*"
+            ],
+            "@/store/*": [
+                "resources/js/store/*"
+            ],
+            "@/utils/*": [
+                "resources/js/utils/*"
+            ],
         }
     },
     "exclude": [
