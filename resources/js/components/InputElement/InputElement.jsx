@@ -6,13 +6,14 @@ import React, { forwardRef, useState } from 'react'
 const InputElement = forwardRef(({
     label,
     error,
+    apiError,
     name,
     className,
     search,
     type,
     required,
     formClassName = '',
-    onKeyPress,
+    onKeyPress = ()=>{},
     value,
     loader,
     ...otherProps
@@ -28,13 +29,12 @@ const InputElement = forwardRef(({
 
     const inputProps = {
         name,
-        ref,
-        error,
+        ref,        
         id: name,
         value: value || '',
         loader,
         onKeyPress: handleKeyPress,
-        className: `border text-gray-90 shadow-sm text-sm rounded-md block w-full p-2 ing-1 ring-inset ring-gray-300 placeholder:text-gray-400 placeholder:text-xs outline-none focus:border-blue-600 ${className ? `${className} ` : ''}${(error) ? ' border-red-600' : ' border-gray-200'}`,
+        className: `border text-gray-90 shadow-sm text-sm rounded-md block w-full p-2 ing-1 ring-inset ring-gray-300 placeholder:text-gray-400 placeholder:text-xs outline-none focus:border-blue-600 ${className ? `${className} ` : ''}${(error || apiError) ? ' border-red-600' : ' border-gray-200'}`,
         ...otherProps
     }
 

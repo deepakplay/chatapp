@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-import InputElement from '@/components/InputElement/InputElement';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useFormik } from 'formik';
 import { SignUpSchema } from './signupSchema';
 import Button from '@/components/Button/Button';
+import InputElement from '@/components/InputElement/InputElement';
+import { useSelector } from 'react-redux';
 
 const INIT_STATE = {
     name: '',
@@ -15,13 +17,55 @@ const INIT_STATE = {
 const Signup = () => {
     const [formLoading, setFormLoading] = useState(false);
     const navigate = useNavigate();
+    const signUpController = useRef(null);
+    // const { token } = useSelector(state => state.auth);
+    const [apiError, setApiError] = useState('');
 
+    useEffect(() => {
+        return () => {
+            if (signUpController.current) {
+                signUpController.current.abort();
+            }
+        }
+    }, []);
 
-    const handleFormSubmit = (values) => {
+    const handleFormSubmit = async (values) => {
         setFormLoading(true);
-        navigate('/signin')
+
+        signUpController.current = new AbortController();
+
+        try {
+
+            const config = {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    // 'Authorization': `Bearer ${token}`
+                },
+                signal: signUpController.current.signal
+            }
+
+            const data = {
+                name: values.name,
+                email: values.email,
+                password: values.password,
+            }
+
+
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/register`, data, config);
+            const responseData = response.data;
+
+            if (responseData?.success) {
+                navigate('/signin')
+            } else {
+                setApiError(responseData?.message || '');
+            }
+        } catch (e) {
+            console.log(e);
+        }
         setFormLoading(false);
     }
+
 
     const formik = useFormik({
         initialValues: { ...INIT_STATE },
@@ -47,6 +91,7 @@ const Signup = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={formik.errors.name && formik.touched.name ? formik.errors.name : null}
+                apiError={apiError}
             />
             <InputElement
                 type="text"
@@ -57,6 +102,7 @@ const Signup = () => {
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 error={formik.errors.email && formik.touched.email ? formik.errors.email : null}
+                apiError={apiError}
             />
             <InputElement
                 type="password"
@@ -68,7 +114,8 @@ const Signup = () => {
                 onBlur={formik.handleBlur}
                 error={formik.errors.password && formik.touched.password ? formik.errors.password : null}
             />
-
+            {apiError && <span className="text-red-600 text-xs">{apiError}</span>}
+            
             <div>
                 <Button loading={formLoading}>Sign up</Button>
             </div>
